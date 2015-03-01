@@ -25,8 +25,8 @@ df_test = pd.read_csv('test.csv')
 train, test = transform(df_train), transform(df_test)
 
 
-cols = ['date','time', 'season', 'holiday', 'workingday', 'weather', 'temp', 'atemp', 'humidity', 'windspeed']
-rf = RandomForestRegressor(n_estimators=200)
+cols = ['date','time', 'season', 'holiday', 'workingday', 'weather', 'atemp', 'humidity', 'windspeed']
+rf = RandomForestRegressor(n_estimators=300)
 
 casual = rf.fit(train[cols], train.casual)
 print casual.feature_importances_
@@ -38,5 +38,5 @@ predict_registered = rf.predict(test[cols])
 
 count = [int(round(i+j)) for i,j in zip(predict_casual, predict_registered)]
 
-df_submission = pd.DataFrame(count, test['datetime'])
+df_submission = pd.DataFrame(count, test['datetime'], columns = ['count'])
 pd.DataFrame.to_csv(df_submission ,'randomforest_predict.csv')
