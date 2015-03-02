@@ -15,18 +15,21 @@ def transform(df):
         i += 1
         date_object = datetime.strptime(timestamp.split()[0], '%Y-%m-%d')
         time = timestamp.split()[1][:2]
-        date = datetime.date(date_object).weekday()
-        df.loc[i-1, 'date'] = date
+        day = datetime.date(date_object).weekday()
+        year_dict = {2011:1, 2012:2}
+        year = year_dict[date_object.year]
+        df.loc[i-1, 'day'] = day
         df.loc[i-1, 'time'] = time
+        df.loc[i-1, 'year'] = year
     return df
+
 
 df_train = pd.read_csv('train.csv')
 df_test = pd.read_csv('test.csv')
 train, test = transform(df_train), transform(df_test)
 
-
-cols = ['date','time', 'season', 'holiday', 'workingday', 'weather', 'atemp', 'humidity', 'windspeed']
-rf = RandomForestRegressor(n_estimators=300)
+cols = ['day', 'time','year', 'season', 'holiday', 'workingday', 'weather','temp', 'atemp', 'humidity', 'windspeed']
+rf = RandomForestRegressor(n_estimators=1000, min_samples_split=6, oob_score=True)
 
 casual = rf.fit(train[cols], train.casual)
 print casual.feature_importances_
