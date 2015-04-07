@@ -3,9 +3,10 @@
 
 import pandas as pd
 import numpy as np
-from sklearn import preprocessing
 from datetime import datetime
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import BaggingRegressor
 
 np.set_printoptions(threshold=np.nan)
 
@@ -28,18 +29,18 @@ df_train = pd.read_csv('train.csv')
 df_test = pd.read_csv('test.csv')
 train, test = transform(df_train), transform(df_test)
 
-cols = ['day', 'time','year', 'season', 'holiday', 'workingday', 'weather','temp', 'atemp', 'humidity', 'windspeed']
+cols = ['day', 'time','year', 'season', 'weather', 'atemp' ,'temp', 'humidity','windspeed']
 rf = RandomForestRegressor(n_estimators=1000, min_samples_split=6, oob_score=True)
 
-casual = rf.fit(train[cols], train.casual)
-print casual.feature_importances_
-predict_casual = rf.predict(test[cols])
+casual_rf = rf.fit(train[cols], train.casual)
+
+predict_casual_rf = rf.predict(test[cols])
 
 registered = rf.fit(train[cols], train.registered)
-print registered.feature_importances_
-predict_registered = rf.predict(test[cols])
 
-count = [int(round(i+j)) for i,j in zip(predict_casual, predict_registered)]
+predict_registered_rf = rf.predict(test[cols])
+
+count = [abs(int(round(i+j))) for i,j in zip(predict_casual_rf, predict_registered_rf)]
 
 df_submission = pd.DataFrame(count, test['datetime'], columns = ['count'])
 pd.DataFrame.to_csv(df_submission ,'randomforest_predict.csv')
